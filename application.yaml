@@ -1,0 +1,28 @@
+---
+apiVersion: argoproj.io/v1alpha1  #API version will change, as new releasaes of ArgoCD will be released.
+kind: Application
+metadata:
+  name: myapp-argo-application
+  namespace: argocd
+spec:
+  project: default    #Every application belongs to a single project. If unspecified an application belongs to the "default" project.
+
+  source:
+    repoURL: https://github.com/reachmesayeed89/SampleGitOpsApp.git
+    targetRevision: HEAD
+    path: dev
+  destination:
+    server: https://kubernetes.default.svc       #Endpoint of k8s API server
+    namespace: myapp
+
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true      #Ensure that the namespace specified exists in the destination cluster
+
+    automated:                    #1. Enable automatic self-healing, 
+      selfHeal: true                          #By default, changes made to the live cluster will not trigger automated sync
+      prune: true                  #2. Enable automatic pruning
+                                        #By default, automatic sync will not delete resources
+                                    #3. polling #ArgoCD polls Git repository every 3 mins
+                                        #If you dont want this deplay, then you can configure a Git webhook
+      
